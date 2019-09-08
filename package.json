@@ -1,6 +1,6 @@
 {
   "name": "postgresqlre",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Lwt-friendly wrapper for postgresql-reason which supports connection pooling.",
   "license": "MIT",
   "esy": {

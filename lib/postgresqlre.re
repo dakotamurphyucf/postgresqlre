@@ -24,7 +24,7 @@ let connect = (~conninfo) =>
   Lwt_preemptive.detach(
     () =>
       try (Ok((new Postgresql.connection)(~conninfo, ()))) {
-      | Postgresql.Error(e) => Error(e)
+      | Postgresql.Error(e) => Error(Postgresql.string_of_error(e))
       }
   );
 
@@ -39,9 +39,9 @@ let rec wait_for_result = (conn: connection) => {
       /* Free up the connection. */
       assert (conn#get_result == None);
       switch result#status {
-        | Bad_response as s
-        | Nonfatal_error as s
-        | Fatal_error as s => Lwt.return(Error(Postgresql.Unexpected_status(s, result#error, [])))
+        | Bad_response
+        | Nonfatal_error
+        | Fatal_error => Lwt.return(Error(result#error))
         | _ => Lwt.return(Ok(Some(result)))
       };
     };
@@ -55,7 +55,7 @@ let send_query_and_wait = (query, params, conn: connection) =>
       wait_for_result(conn);
     },
     fun
-    | Postgresql.Error(e) => Lwt.return(Error(e))
+    | Postgresql.Error(e) => Lwt.return(Error(Postgresql.string_of_error(e)))
     | e => Lwt.fail(e)
   );
 
@@ -68,7 +68,7 @@ let one = (~query, ~params=[||], conn: connection) =>
       | Some(result) => {
         switch result#status {
         | Tuples_ok => result#ntuples > 0 ? Some(result#get_tuple(0)) |> Lwt_result.return : Lwt_result.return(None)
-        | _ as status => Lwt_result.fail(Postgresql.Unexpected_status(status, "expected row returned", [Tuples_ok]))
+        | _ => Lwt_result.fail("Query expected row to be returned")
         };
       }
     )
@@ -95,7 +95,7 @@ let finish = (conn) =>
   Lwt_preemptive.detach(
     (c: connection) =>
       try (Ok(c#finish)) {
-      | Postgresql.Error(e) => Error(e)
+      | Postgresql.Error(e) => Error(Postgresql.string_of_error(e))
       },
     conn
   );
