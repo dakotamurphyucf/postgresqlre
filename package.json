@@ -1,0 +1,39 @@
+{
+  "name": "postgresqlre",
+  "version": "0.0.5",
+  "description": "Lwt-friendly wrapper for postgresql-reason which supports connection pooling.",
+  "license": "MIT",
+  "esy": {
+    "build": "refmterr dune build -p #{self.name}",
+    "NOTE": "Optional release Section. Customizesresult of `esy release`",
+    "release": {
+      "bin": [],
+      "includePackages": [
+        "root",
+        "@opam/dune"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "esy x Hello",
+    "doc": "esy dune build @doc"
+  },
+  "dependencies": {
+    "@esy-ocaml/reason": ">=3.4.0",
+    "@opam/dune": "*",
+    "@reason-native/console": "*",
+    "@reason-native/pastel": "*",
+    "@reason-native/rely": "*",
+    "ocaml": "~4.6.0",
+    "refmterr": "^3.1.10",
+    "@opam/postgresql": ">=4.0",
+    "@opam/lwt": "*",
+    "@opam/result": "*",
+    "@opam/lwt_ppx": "*"
+  },
+  "devDependencies": {
+    "@opam/merlin": "*",
+    "ocaml": "~4.6.0",
+    "@opam/odoc": "*"
+  }
+}

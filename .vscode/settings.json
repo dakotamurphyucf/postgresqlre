@@ -1,0 +1,4 @@
+{
+  "reason.codelens.enabled": true,
+  "reason.debounce.linter": 500
+}

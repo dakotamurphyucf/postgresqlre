@@ -1,0 +1,7 @@
+(library
+  (name postgresqlre)
+  (public_name postgresqlre)
+  (wrapped false)
+  (preprocess (pps lwt_ppx))
+  (libraries postgresql lwt.unix result)
+)
