@@ -41,7 +41,11 @@ let rec wait_for_result = (conn: connection) => {
       switch result#status {
         | Bad_response
         | Nonfatal_error
-        | Fatal_error => Lwt.return(Error(result#error))
+        | Fatal_error => {
+          let code = Postgresql.Error_code.to_string(result#error_code)
+          let errmsg = result#error
+          Lwt.return(Error((code, errmsg)))
+        }
         | _ => Lwt.return(Ok(Some(result)))
       };
     };
@@ -55,7 +59,6 @@ let send_query_and_wait = (query, params, conn: connection) =>
       wait_for_result(conn);
     },
     fun
-    | Postgresql.Error(e) => Lwt.return(Error(Postgresql.string_of_error(e)))
     | e => Lwt.fail(e)
   );
 
@@ -68,7 +71,7 @@ let one = (~query, ~params=[||], conn: connection) =>
       | Some(result) => {
         switch result#status {
         | Tuples_ok => result#ntuples > 0 ? Some(result#get_tuple(0)) |> Lwt_result.return : Lwt_result.return(None)
-        | _ => Lwt_result.fail("Query expected row to be returned")
+        | _ => Lwt_result.fail(("EXPECTED_ROW_RETURN", "Query expected row to be returned"))
         };
       }
     )
